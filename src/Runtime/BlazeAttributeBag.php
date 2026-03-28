@@ -202,10 +202,10 @@ class BlazeAttributeBag extends ComponentAttributeBag
      */
     public function __toString()
     {
-        $parts = [];
+        $result = '';
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === false || is_null($value)) {
+            if ($value === false || $value === null) {
                 continue;
             }
 
@@ -213,13 +213,18 @@ class BlazeAttributeBag extends ComponentAttributeBag
                 $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
             }
 
-            if (str_starts_with($value, 'BLAZE_PLACEHOLDER_') && str_ends_with($value, '_')) {
-                $parts[] = '[BLAZE_ATTR:'.$value.':'.$key.']';
+            if ($result !== '') {
+                $result .= ' ';
+            }
+
+            if ($value !== '' && $value[0] === 'B' && str_starts_with($value, 'BLAZE_PLACEHOLDER_') && str_ends_with($value, '_')) {
+                $result .= '[BLAZE_ATTR:'.$value.':'.$key.']';
             } else {
-                $parts[] = $key.'="'.str_replace('"', '\\"', trim($value)).'"';
+                $value = trim($value);
+                $result .= $key.'="'.(str_contains($value, '"') ? str_replace('"', '\\"', $value) : $value).'"';
             }
         }
 
-        return implode(' ', $parts);
+        return $result;
     }
 }
